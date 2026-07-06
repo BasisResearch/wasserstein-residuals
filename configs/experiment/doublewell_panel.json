@@ -1,0 +1,6 @@
+{
+  "_comment": "Double-well illustrative 2x3 panel (NOT a benchmark). Composed as '<variant>:stitching:doublewell_panel' by the `doublewell` experiment (python -m experiments all doublewell), where <variant> sweeps the three observation regimes doublewell / doublewell-terminal / doublewell-trickle.",
+  "epochs": 2000,
+  "seed": 0,
+  "plot": false
+}

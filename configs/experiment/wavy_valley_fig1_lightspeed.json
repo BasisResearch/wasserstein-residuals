@@ -1,0 +1,17 @@
+{
+  "_comment": "Fig-1 — Lightspeed (JKOnet*) on the wavy-valley SDE. Compose as 'wavy_valley:lightspeed:wavy_valley_fig1_lightspeed'. Shares the Stitching run's data-generation schedule (identical data); lightspeed_coupling='natural' because the snapshots are coupled. Lightspeed method hyperparameters are inherited from configs/method/lightspeed.json.",
+  "synth_beta": 0.00625,
+  "synth_snapshot_times": [0.0, 5.0, 10.0, 20.0, 30.0],
+  "synth_n_particles": 80,
+  "synth_train_fraction": 0.5,
+  "synth_init": "normal",
+  "synth_init_loc": [-3.0, 1.0],
+  "synth_init_scale": 0.1,
+  "synth_dt": 0.5,
+  "synth_n_substeps": 10,
+  "synth_coupled": true,
+  "lightspeed_coupling": "natural",
+  "epochs": 10000,
+  "seed": 0,
+  "plot": false
+}

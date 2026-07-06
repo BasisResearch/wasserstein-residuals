@@ -1,0 +1,21 @@
+wasserstein-residuals
+Copyright 2026 Basis Research Institute and the Stitching contributors.
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE.md).
+
+--------------------------------------------------------------------------------
+Third-party data
+--------------------------------------------------------------------------------
+
+data/RNA_PCA_5/ contains a PCA-reduced derivative of published single-cell
+RNA-seq data, redistributed with attribution:
+
+  - Embryoid-body scRNA-seq: Moon et al., "Visualizing structure and transitions
+    in high-dimensional biological data," Nature Biotechnology 37 (2019).
+    Data: Mendeley v6n743h5ng.
+  - PCA-embedded artifact (eb_velocity_v5.npz): Tong et al., "TrajectoryNet: A
+    Dynamic Optimal Transport Network for Modeling Cellular Dynamics," ICML 2020.
+    Code MIT-licensed (https://github.com/KrishnaswamyLab/TrajectoryNet).
+
+See data/README.md for details. All other data artifacts in data/ are simulated
+in this repository and are covered by the repository's Apache-2.0 license.

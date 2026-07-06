@@ -1,0 +1,14 @@
+{
+  "_comment": "Stitching: learnable particle trajectories with NLL + WGF consistency loss (trapezoidal scheme).",
+  "model": "stitching",
+  "epochs": 1000,
+  "lr": 0.005,
+  "potential_hidden": [64, 64],
+  "num_particles": 100,
+  "num_steps": 50,
+  "lengthscale": "silverman",
+  "stitching_coeff": 1.0,
+  "stitching_scheme": "trapez",
+  "stitching_norm": "raw",
+  "interaction_hidden": [64, 64]
+}

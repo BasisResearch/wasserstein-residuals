@@ -1,0 +1,6 @@
+{
+  "_comment": "RNA dataset with gappy observations: train on t_{0,2,4}, evaluate on held-out t_{1,3}.",
+  "dataset": "rna",
+  "train_timepoint_idx": [0, 2, 4],
+  "eval_timepoint_idx": [1, 3]
+}

@@ -1,0 +1,11 @@
+{
+  "_comment": "CIS (Cell-Interaction Simulation) 2-D dataset with particle-particle interactions.",
+  "dataset": "cis",
+  "dims": 2,
+  "entropy_coeff": 0.03,
+  "potential_coeff": 1.0,
+  "interaction_coeff": 1.0,
+  "interaction_type": "radial",
+  "train_fraction": 0.5,
+  "scale_time": false
+}

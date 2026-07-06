@@ -1,0 +1,9 @@
+{
+  "_comment": "Synthetic 2D potential-recovery panel (paper Sec. app:synthetic_full / Table 4). Composed as 'synthetic:stitching:synthetic_panel' by the `synthetic` experiment (python -m experiments all synthetic), which sweeps `potential` (15 landscapes) and `synth_coupled` (paired/unpaired) as its two axes.",
+  "num_particles": 1000,
+  "stitching_residual_alpha": 0.0,
+  "freeze_particle_weights": true,
+  "epochs": 2000,
+  "seed": 0,
+  "plot": false
+}

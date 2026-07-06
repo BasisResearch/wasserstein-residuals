@@ -1,0 +1,8 @@
+{
+  "_comment": "Fig-3 / Table-2 full-RNA run. Composed as 'rna:stitching:rna_fig3' by the `rna` experiment (python -m experiments all rna), which sweeps time_conditioned_potential (static vs tcond panel rows).",
+  "epochs": 10000,
+  "seed": 0,
+  "stitching_residual_alpha": 0.0,
+  "eval_reps": 3,
+  "plot": false
+}

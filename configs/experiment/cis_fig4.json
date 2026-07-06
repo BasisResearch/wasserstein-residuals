@@ -1,0 +1,7 @@
+{
+  "_comment": "Fig-4 / Table-3 CIS run. Composed as 'cis:stitching:cis_fig4' by the `cis` experiment (python -m experiments all cis). Distributional metrics on held-out test snapshots use eval_reps repetitions.",
+  "epochs": 1000,
+  "seed": 0,
+  "eval_reps": 3,
+  "plot": false
+}
