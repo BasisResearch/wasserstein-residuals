@@ -164,12 +164,14 @@ The slow gate's reference CSV is platform-baked, so `make test` deselects it.
 If you use the code from this repository, please consider citing the paper:
 
 ```bibtex
-@article{heinonen2026stitching,
-  title   = {Stitching: Learning Population Dynamics via Wasserstein Gradient Flows},
-  author  = {Heinonen, Markus and Shenfeld, Yair and Baptista, Ricardo and Waxman, Daniel and Batenkov, Dmitry and Cooijmans, Tim and Bingham, Eli and Sergeev, Fedor},
-  journal = {arXiv preprint arXiv:2607.04738},
-  year    = {2026},
-  url     = {https://arxiv.org/abs/2607.04738}
+@misc{heinonen2026stitching,
+      title={Wasserstein Residuals: Learning Gradient Flows from Population Dynamics}, 
+      author={Markus Heinonen and Yair Shenfeld and Ricardo Baptista and Daniel Waxman and Dmitry Batenkov and Tim Cooijmans and Eli Bingham},
+      year={2026},
+      eprint={2607.04738},
+      archivePrefix={arXiv},
+      primaryClass={stat.ML},
+      url={https://arxiv.org/abs/2607.04738}, 
 }
 ```
 
