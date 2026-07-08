@@ -1,0 +1,6 @@
+{
+  "_comment": "Fig-5 chiral McKean-Vlasov run. Composed as 'chiral:stitching:chiral_fig5' by the `chiral` experiment (python -m experiments all chiral). Pins the published run-level knobs; the model/data science lives in the chiral data preset.",
+  "epochs": 1000,
+  "seed": 0,
+  "plot": false
+}

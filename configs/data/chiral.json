@@ -1,0 +1,11 @@
+{
+  "_comment": "Chiral McKean-Vlasov SDE (non-conservative kernel K = rho*(-grad W) + omega*R90(-grad W), W = generalised Morse; omega=1.5, rho=0.2 -> NOT a Wasserstein gradient flow; the paper's intended failure mode). Pre-split train/test in data/chiral/chiral-simulation.npz (regenerate with data/chiral/generate.py). V-free: the radial interaction W_theta is the only learned functional (potential_coeff 0).",
+  "dataset": "chiral",
+  "dims": 2,
+  "entropy_coeff": 0.03,
+  "potential_coeff": 0.0,
+  "interaction_coeff": 1.0,
+  "interaction_type": "radial",
+  "train_fraction": 0.5,
+  "scale_time": false
+}

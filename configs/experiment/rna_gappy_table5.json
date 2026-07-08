@@ -1,0 +1,8 @@
+{
+  "_comment": "Table-5 RNA leave-two-out interpolation: train on t_{0,2,4}, evaluate W2 at held-out t_{1,3}. Composed as 'rna-gappy:stitching:rna_gappy_table5' by the `rna` experiment (python -m experiments all rna), which sweeps time_conditioned_potential (static/tcond) and seed (paper: 0-4).",
+  "epochs": 10000,
+  "seed": 0,
+  "stitching_residual_alpha": 0.0,
+  "eval_reps": 3,
+  "plot": false
+}

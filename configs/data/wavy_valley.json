@@ -1,0 +1,15 @@
+{
+  "_comment": "Wavy-valley fig1 testbed. V(x1,x2) = 0.6*(x2 - sin(pi x1/2))^2 - 0.5*x1. The minimum-energy curve is x2 = sin(pi x1/2). Particles fall onto the valley quickly, then drift slowly downhill (-x1 direction) along it. The synth_* fields below are GENERIC defaults (uniform snapshot schedule); the published Fig-1 run overrides them via the experiment preset configs/experiment/wavy_valley_fig1_*.json (irregular snapshot_times, normal init at [-3,1], beta=0.00625). Composed as 'wavy_valley:stitching:wavy_valley_fig1_stitching' by the `wavy_valley` experiment (python -m experiments all wavy_valley).",
+  "potential": "wavy_valley",
+  "dims": 2,
+  "entropy_coeff": 0.05,
+  "synth_train_fraction": 0.5,
+  "synth_init": "uniform",
+  "synth_init_loc": 0.0,
+  "synth_init_scale": 3.0,
+  "synth_n_particles": 500,
+  "synth_n_timesteps": 4,
+  "synth_dt": 1.5,
+  "synth_n_substeps": 30,
+  "synth_beta": 0.05
+}

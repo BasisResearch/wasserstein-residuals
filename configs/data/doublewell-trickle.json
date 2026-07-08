@@ -1,0 +1,17 @@
+{
+  "_comment": "1-D double-well in horizon t in [0, 4] as a fine 1000-snapshot trickle with 10 cells per snapshot. Uncoupled marginals: each snapshot subsamples independently, no trajectory identity is exposed.",
+  "potential": "doublewell",
+  "dims": 1,
+  "entropy_coeff": 1.0,
+  "synth_n_particles": 1000,
+  "synth_n_timesteps": 999,
+  "synth_dt": 0.004004004004004004,
+  "synth_n_substeps": 1,
+  "synth_train_fraction": 0.5,
+  "synth_beta": 1.0,
+  "synth_init": "normal",
+  "synth_init_loc": 0.0,
+  "synth_init_scale": 1.0,
+  "obs_protocol": "trickle",
+  "obs_n_per_snapshot": 10
+}

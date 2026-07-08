@@ -1,0 +1,10 @@
+{
+  "_comment": "Lightspeed = JKOnet*-potential (Terpin et al. 2024). First-order JKO residual ||tau * grad V_theta(y) + (y - x)||^2 on OT-coupled consecutive observed snapshots. Entropy is TRAINABLE here (init 0.05) to match the bridge/stitching method's setup; pin via freeze_entropy to recover the deterministic JKOnet*_V baseline.",
+  "model": "lightspeed",
+  "epochs": 1000,
+  "lr": 0.001,
+  "potential_hidden": [64, 64],
+  "entropy_coeff": 0.05,
+  "potential_coeff": 1.0,
+  "lightspeed_coupling": "ot"
+}

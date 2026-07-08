@@ -1,0 +1,15 @@
+{
+  "_comment": "1-D double-well V(x) = 0.5 (|x| - 7)^2, horizon t in [0, 4] with 20 evenly-spaced snapshots and 500 train cells per snapshot.",
+  "potential": "doublewell",
+  "dims": 1,
+  "entropy_coeff": 1.0,
+  "synth_n_particles": 1000,
+  "synth_n_timesteps": 19,
+  "synth_dt": 0.21052631578947367,
+  "synth_n_substeps": 50,
+  "synth_train_fraction": 0.5,
+  "synth_beta": 1.0,
+  "synth_init": "normal",
+  "synth_init_loc": 0.0,
+  "synth_init_scale": 1.0
+}

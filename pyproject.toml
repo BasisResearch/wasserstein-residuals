@@ -1,0 +1,99 @@
+[build-system]
+# >=77 for PEP 639 SPDX license expressions; setuptools builds wheels itself.
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stitching"
+version = "0.1.0"
+description = "Stitching: learning population dynamics via Wasserstein gradient flows"
+readme = "README.md"
+requires-python = ">=3.12, <3.14"
+authors = [
+    {name = "Markus Heinonen"},
+    {name = "Yair Shenfeld"},
+    {name = "Ricardo Baptista"},
+    {name = "Daniel Waxman"},
+    {name = "Dmitry Batenkov"},
+    {name = "Tim Cooijmans"},
+    {name = "Eli Bingham"},
+    {name = "Fedor Sergeev"},
+]
+maintainers = [
+    {name = "Basis"},
+]
+license = "Apache-2.0"
+license-files = ["LICENSE.md"]
+keywords = ["population dynamics", "wasserstein gradient flow", "jax", "equinox", "optimal transport"]
+dependencies = [
+    "jax",
+    "equinox",
+    "diffrax",
+    "lineax",
+    "optax",
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "tqdm",
+    "pot",
+    "simple-parsing"
+]
+
+[project.urls]
+Repository = "https://github.com/BasisResearch/wasserstein-residuals"
+Homepage = "https://github.com/BasisResearch/wasserstein-residuals"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-xdist",
+    "pytest-benchmark",
+    "mypy",
+    "ruff",
+    "nbval",
+    "nbqa"
+]
+baselines = [
+    "torch",
+    "pyyaml"
+]
+notebook = [
+    "jupyter",
+    "ipywidgets"
+]
+
+[dependency-groups]
+dev = ["stitching[test]"]
+
+[tool.setuptools]
+packages = { find = { include = ["stitching*"] } }
+
+# No package-data: the JSON presets live in the top-level ``configs/`` tree
+# (resolved relative to the repo root or ``$STITCHING_CONFIG_DIR``), not bundled
+# in the wheel; datasets live at the top-level ``data/`` dir (fetched / generated
+# on demand). The real workflow is clone + editable install, where both are
+# present next to the package.
+
+[tool.mypy]
+ignore_missing_imports = true
+warn_unused_ignores = true
+disable_error_code = ["import-untyped"]
+exclude = ["build", "experiments"]
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["F", "I", "PERF", "UP"]
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules"
+testpaths = ["./stitching", "./tests"]
+# The repo root on sys.path so tests can ``import experiments`` (the experiment
+# drivers are a repo-local package, deliberately not pip-installed). Collection
+# is still bounded by testpaths, so experiments/ is not doctest-scanned.
+pythonpath = ["."]
+markers = [
+    "slow: end-to-end parity run (deselect with '-m \"not slow\"')",
+]
