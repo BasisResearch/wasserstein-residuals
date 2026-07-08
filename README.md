@@ -1,7 +1,7 @@
 # Stitching
 
 > The method and its Python package are called **Stitching**; this is the
-> `wasserstein-residuals` repository that hosts them.
+> `wasserstein-residuals` repository that hosts them. More details on the stitching method can be found in the [corresponding paper](https://arxiv.org/abs/2607.04738).
 
 Learning population dynamics from temporal snapshots via Wasserstein gradient
 flows. `stitching/` is the importable library (models + harness);
