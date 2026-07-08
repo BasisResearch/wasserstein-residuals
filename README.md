@@ -1,7 +1,7 @@
 # Stitching
 
 > The method and its Python package are called **Stitching**; this is the
-> `wasserstein-residuals` repository that hosts them.
+> `wasserstein-residuals` repository that hosts them. More details on the stitching method can be found in the [corresponding paper](https://arxiv.org/abs/2607.04738).
 
 Learning population dynamics from temporal snapshots via Wasserstein gradient
 flows. `stitching/` is the importable library (models + harness);
@@ -158,6 +158,22 @@ The slow gate's reference CSV is platform-baked, so `make test` deselects it.
 - [Tim Cooijmans](https://github.com/cooijmanstim)
 - [Eli Bingham](https://github.com/eb8680)
 - [Fedor Sergeev](https://github.com/TheodorSergeev)
+
+## Citation
+
+If you use the code from this repository, please consider citing the paper:
+
+```bibtex
+@misc{heinonen2026stitching,
+      title={Wasserstein Residuals: Learning Gradient Flows from Population Dynamics}, 
+      author={Markus Heinonen and Yair Shenfeld and Ricardo Baptista and Daniel Waxman and Dmitry Batenkov and Tim Cooijmans and Eli Bingham},
+      year={2026},
+      eprint={2607.04738},
+      archivePrefix={arXiv},
+      primaryClass={stat.ML},
+      url={https://arxiv.org/abs/2607.04738}, 
+}
+```
 
 ## Provenance & licence
 

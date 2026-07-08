@@ -1,0 +1,45 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Wasserstein Residuals: Learning Gradient Flows from Population Dynamics"
+authors:
+  - family-names: Heinonen
+    given-names: Markus
+  - family-names: Shenfeld
+    given-names: Yair
+  - family-names: Baptista
+    given-names: Ricardo
+  - family-names: Waxman
+    given-names: Daniel
+  - family-names: Batenkov
+    given-names: Dmitry
+  - family-names: Cooijmans
+    given-names: Tim
+  - family-names: Bingham
+    given-names: Eli
+repository-code: "https://github.com/BasisResearch/wasserstein-residuals"
+license: Apache-2.0
+preferred-citation:
+  type: article
+  title: "Wasserstein Residuals: Learning Gradient Flows from Population Dynamics"
+  authors:
+    - family-names: Heinonen
+      given-names: Markus
+    - family-names: Shenfeld
+      given-names: Yair
+    - family-names: Baptista
+      given-names: Ricardo
+    - family-names: Waxman
+      given-names: Daniel
+    - family-names: Batenkov
+      given-names: Dmitry
+    - family-names: Cooijmans
+      given-names: Tim
+    - family-names: Bingham
+      given-names: Eli
+  year: 2026
+  url: "https://arxiv.org/abs/2607.04738"
+  identifiers:
+    - type: other
+      value: "arXiv:2607.04738"
+      description: arXiv preprint
