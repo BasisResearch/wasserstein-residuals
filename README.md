@@ -159,6 +159,20 @@ The slow gate's reference CSV is platform-baked, so `make test` deselects it.
 - [Eli Bingham](https://github.com/eb8680)
 - [Fedor Sergeev](https://github.com/TheodorSergeev)
 
+## Citation
+
+If you use the code from this repository, please consider citing the paper:
+
+```bibtex
+@article{heinonen2026stitching,
+  title   = {Stitching: Learning Population Dynamics via Wasserstein Gradient Flows},
+  author  = {Heinonen, Markus and Shenfeld, Yair and Baptista, Ricardo and Waxman, Daniel and Batenkov, Dmitry and Cooijmans, Tim and Bingham, Eli and Sergeev, Fedor},
+  journal = {arXiv preprint arXiv:2607.04738},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2607.04738}
+}
+```
+
 ## Provenance & licence
 
 Apache-2.0 (see [LICENSE.md](LICENSE.md)). The KDE primitives under `stitching/_kde/`
