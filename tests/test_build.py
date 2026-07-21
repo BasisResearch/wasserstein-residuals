@@ -57,6 +57,22 @@ def test_build_dispatches_to_registered_class() -> None:
         assert isinstance(model, spec.model_cls)
 
 
+def test_build_model_threads_trajectory_init_to_stitching() -> None:
+    # _make_stitching must forward cfg.trajectory_init into Stitching.from_data,
+    # so the "mccann" seeding builds a well-shaped trajectory through the registry.
+    data = _tiny_data()
+    cfg = Config(
+        potential="doublewell",
+        model="stitching",
+        num_particles=10,
+        num_steps=4,
+        trajectory_init="mccann",
+    )
+    model = build_model(cfg, data, jax.random.key(0))
+    assert isinstance(model, Stitching)
+    assert model.trajectories.shape == (4, 10, 2)
+
+
 def test_build_model_unknown_model_raises_naming_known() -> None:
     cfg = Config(potential="doublewell", model="mystery")
     with pytest.raises(

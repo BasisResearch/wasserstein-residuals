@@ -48,7 +48,7 @@ from stitching.residual import (
     wgf_residual,
 )
 from stitching.utils.nn import MLP, field_mlp, inv_softplus
-from stitching.utils.ot import hungarian_match
+from stitching.utils.ot import bures_map, gaussian_moments, hungarian_match, psd_sqrt
 from stitching.velocity import WGFFunctional, nll
 
 # ---------------------------------------------------------------------------
@@ -154,23 +154,40 @@ class Stitching(eqx.Module):
         interaction_type: str = "radial",
         interaction_hidden: tuple[int, ...] = (64, 64),
         time_conditioned: bool = False,
+        trajectory_init: str = "ot",
     ) -> Stitching:
-        """Build from training data: OT-interpolated trajectory + Silverman bandwidth.
+        """Build from training data: interpolated trajectory + Silverman bandwidth.
 
-        Particles are seeded by Hungarian-OT matching between the first
-        and last observed snapshots, then linearly interpolated across
-        ``num_steps`` time-grid points (with small data-coherent jitter).
-        ``lengthscale="silverman"`` initialises the per-dimension bandwidth
-        from the t=0 observed particles.
+        ``trajectory_init`` selects how the particle bundle is seeded:
+        ``"ot"`` (default) Hungarian-OT-matches the first and last observed
+        snapshots and linearly interpolates the matched pairs (with small
+        data-coherent jitter); ``"mccann"`` fits a Gaussian to each terminal
+        snapshot and transports shared standard normals along the
+        Bures–Wasserstein OT geodesic (non-braiding — see
+        :func:`mccann_interpolate_trajectories`). ``lengthscale="silverman"``
+        initialises the per-dimension bandwidth from the t=0 observed particles.
         """
         from stitching._kde import silverman_bandwidth
 
-        trajectory, t_grid, key = ot_interpolate_trajectories(
-            train_data,
-            num_particles,
-            num_steps,
-            key,
-        )
+        if trajectory_init == "ot":
+            trajectory, t_grid, key = ot_interpolate_trajectories(
+                train_data,
+                num_particles,
+                num_steps,
+                key,
+            )
+        elif trajectory_init == "mccann":
+            trajectory, t_grid, key = mccann_interpolate_trajectories(
+                train_data,
+                num_particles,
+                num_steps,
+                key,
+            )
+        else:
+            raise ValueError(
+                f"Unknown trajectory_init {trajectory_init!r}; expected "
+                '"ot" or "mccann".'
+            )
 
         if isinstance(lengthscale, (int, float)):
             ls: float | jax.Array = float(lengthscale)
@@ -382,6 +399,77 @@ def ot_interpolate_trajectories(
     trajectory = trajectory + offsets[None, :, :]
 
     return trajectory, t_grid, k2
+
+
+def mccann_interpolate_trajectories(
+    train_data: SpatioTemporalData,
+    num_particles: int,
+    num_steps: int,
+    key: jax.Array,
+    *,
+    cov_eps: float = 1e-6,
+) -> tuple[jax.Array, jax.Array, jax.Array]:
+    r"""Build initial Stitching trajectories via the Gaussian OT geodesic.
+
+    Fits a Gaussian to the first and last observed snapshots and transports one
+    shared batch of standard-normal samples ``eps_i`` along the
+    Bures–Wasserstein (McCann displacement) interpolation between them:
+
+    .. math::
+
+        x_i(a) = m(a) + [(1-a) I + a A]\,(x_i(0) - m_0),
+        \quad x_i(0) = m_0 + \Sigma_0^{1/2} \varepsilon_i,
+
+    where ``a`` runs linearly over ``num_steps`` grid points, ``m(a)`` is the
+    interpolated mean, and ``A`` is the linear OT map from ``N(m0, C0)`` to
+    ``N(mT, CT)`` (``bures_map``). Because ``eps_i`` is fixed across time and the
+    map is a straight affine push-forward, each particle traces a smooth,
+    non-crossing (laminar) path — this is the optimal-transport interpolation
+    between the two Gaussians, so it does not braid (preferred over factor-linear
+    or covariance-linear seedings, which can twist when the terminal covariances
+    are oriented differently).
+
+    Used by :meth:`Stitching.from_data` when ``trajectory_init="mccann"``.
+    Returns ``(trajectory, t_grid, remaining_key)`` with the same shapes and
+    key-reuse contract as :func:`ot_interpolate_trajectories`; ``trajectory`` is
+    ``(num_steps, num_particles, D)`` and ``t_grid`` is ``(num_steps,)``. No
+    jitter is added — independent ``eps_i`` already keep particles distinct, and
+    jitter would perturb the exact terminal covariance. ``cov_eps`` regularises
+    the covariances so ``C0`` is invertible (the tight ``t=0`` blob is
+    near-singular).
+    """
+    dim = train_data.x.shape[1]
+    t_unique = jnp.unique(train_data.t)
+    t_grid = jnp.linspace(float(t_unique[0]), float(t_unique[-1]), num_steps)
+
+    k1, k2 = jax.random.split(key)
+
+    points = np.asarray(train_data.x)
+    obs_times = np.asarray(train_data.t).ravel()
+    unique_np = np.unique(obs_times)
+
+    rng = np.random.default_rng(int(jax.random.randint(k1, (), 0, 2**30)))
+    eps = rng.standard_normal((num_particles, dim))  # shared across time
+
+    reg = cov_eps * np.eye(dim)
+    m0, C0 = gaussian_moments(points[obs_times == unique_np[0]])
+    C0 = C0 + reg
+    x0 = m0 + eps @ psd_sqrt(C0).T  # (N, D) ~ N(m0, C0)
+
+    alpha = np.linspace(0.0, 1.0, num_steps)
+    if unique_np.size >= 2:
+        mT, CT = gaussian_moments(points[obs_times == unique_np[-1]])
+        CT = CT + reg
+        ot_map = bures_map(C0, CT)  # SPD, ot_map @ C0 @ ot_map == CT
+        maps = (1.0 - alpha)[:, None, None] * np.eye(dim)[None] + alpha[
+            :, None, None
+        ] * ot_map[None]  # (T, D, D)
+        means = (1.0 - alpha)[:, None] * m0[None] + alpha[:, None] * mT[None]  # (T, D)
+        trajectory = means[:, None, :] + np.einsum("tij,nj->tni", maps, x0 - m0)
+    else:
+        trajectory = np.broadcast_to(x0[None], (num_steps, num_particles, dim)).copy()
+
+    return jnp.asarray(trajectory, dtype=jnp.float32), t_grid, k2
 
 
 # ---------------------------------------------------------------------------

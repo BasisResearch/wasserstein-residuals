@@ -8,4 +8,13 @@ an experiment: drop a new ``defs/<name>.py`` and list it here.
 
 from __future__ import annotations
 
-from . import chiral, cis, doublewell, rna, synthetic, wavy_valley  # noqa: F401
+from . import (  # noqa: F401
+    chiral,
+    cis,
+    doublewell,
+    rna,
+    synthetic,
+    wavy_valley,
+    wavy_valley_init,
+    mccann_ablation,  # last: derives *_mccann specs from the headline specs above
+)

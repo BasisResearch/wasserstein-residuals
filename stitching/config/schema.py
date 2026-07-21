@@ -59,6 +59,9 @@ class Config:
     lengthscale: float | str = (
         "silverman"  # bandwidth: scalar = fixed everywhere, "silverman" = auto Silverman from t=0 particles
     )
+    trajectory_init: str = (
+        "ot"  # trajectory seed: "ot" (Hungarian-OT interp) | "mccann" (Bures/OT-geodesic Gaussian init)
+    )
     stitching_coeff: float = 1.0  # stitching consistency loss weight
     stitching_scheme: str = (
         "trapez"  # stitching discretisation: "trapez", "euler", "implicit", "midpoint"

@@ -16,8 +16,8 @@ from stitching.models.lightspeed import Lightspeed, LightspeedLoss
 from stitching.models.stitching import Stitching, StitchingLoss
 
 # Only the trainable model/loss containers are part of the package-root surface;
-# the construction helpers (`lightspeed_pairs`, `ot_interpolate_trajectories`)
-# stay importable from their defining submodules.
+# the construction helpers (`lightspeed_pairs`, `ot_interpolate_trajectories`,
+# `mccann_interpolate_trajectories`) stay importable from their defining submodules.
 __all__ = [
     "Lightspeed",
     "LightspeedLoss",

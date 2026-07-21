@@ -108,26 +108,47 @@ def _evaluate(ctx: Context) -> None:
     )
     print(f"  gappy: {len(gappy_rows)} rows → {path}")
 
-    # Full-data EB metrics (paper Table 2, ours) — additive over the old runner.
+    # Full-data EB metrics (paper Table 2, ours) — per-timepoint W1 over all seeds.
+    # The particle split keeps every observed timepoint in the test set, so
+    # ``by_time`` carries W1 at each t∈{0,..,4}; ``w1_mean`` is the across-seed
+    # aggregate over all timepoints (the table averages the transitions it needs).
     full_rows = []
     for vname, label in (("full-static", "static"), ("full-tcond", "tcond")):
-        run = ctx.load(vname)
-        m = evaluate_test_metrics(
-            run.model, run.train_data, run.test_data, eval_reps=run.cfg.eval_reps
-        )
-        full_rows.append(
-            {
+        for seed in ctx.spec.seeds:
+            run = ctx.load(vname, seed=seed)
+            m = evaluate_test_metrics(
+                run.model, run.train_data, run.test_data, eval_reps=run.cfg.eval_reps
+            )
+            by_t = m["emd"]["by_time"]
+            row = {
                 "variant": label,
+                "seed": seed,
                 "fit_id": run.manifest.get("fit_id", ""),
-                "emd_w1": float(m["emd"]["mean"]),
+                "w1_mean": float(m["emd"]["mean"]),
                 "w2": float(m["w2"]["mean"]),
                 "mmd": float(m["mmd"]["mean"]),
+                "wall_time_s": run.metrics.get("wall_time_s", 0.0),
             }
-        )
+            for t in range(5):
+                row[f"w1_t{t}"] = float(by_t.get(float(t), float("nan")))
+            full_rows.append(row)
     ctx.write_csv(
         "rna_metrics.csv",
         full_rows,
-        fieldnames=("variant", "fit_id", "emd_w1", "w2", "mmd"),
+        fieldnames=(
+            "variant",
+            "seed",
+            "fit_id",
+            "w1_t0",
+            "w1_t1",
+            "w1_t2",
+            "w1_t3",
+            "w1_t4",
+            "w1_mean",
+            "w2",
+            "mmd",
+            "wall_time_s",
+        ),
     )
 
 
@@ -284,6 +305,7 @@ SPEC = ExperimentSpec(
         Variant("gappy-static", GAPPY, {"time_conditioned_potential": False}),
         Variant("gappy-tcond", GAPPY, {"time_conditioned_potential": True}),
     ),
+    seeds=(0, 1, 2, 3, 4),
     evaluate=_evaluate,
     plots={"panels": _plot_panels},
 )

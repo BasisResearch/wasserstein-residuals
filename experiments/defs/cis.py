@@ -32,8 +32,78 @@ def _pattern_r2(a, b) -> float:
     return float(np.sum(a * b) / max(denom, 1e-12)) ** 2
 
 
+def _functional_r2(run) -> tuple[float, float]:
+    """Pattern-R² of learned V_θ vs V* and radial W_θ vs W* (paper Table 3).
+
+    Deterministic (no model sampling): the V grid spans the pooled train+test
+    observation frame (the snapshot panels' data frame), evaluated at the mid
+    trajectory time for a time-conditioned potential. R²(W) is the pattern-R²
+    over the 5–95th-percentile band of observed mid-time pairwise distances, and
+    is ``nan`` when the model carries no interaction term.
+    """
+    import jax
+    import jax.numpy as jnp
+
+    from stitching.synthetic.potentials import doublewell_nd, gaussian_interaction
+    from stitching.utils.paper_plots import frame_limits, pool_observations
+
+    model, train_data, test_data = run.model, run.train_data, run.test_data
+    v_true = doublewell_nd(alpha=0.1, beta=4.0)
+    w_true = gaussian_interaction(strength=-2.2, width=1.0)
+
+    _obs_t, obs_x = pool_observations(train_data, test_data)
+    xlim, ylim = frame_limits([obs_x])
+
+    n_grid = 80
+    gx = np.linspace(*xlim, n_grid)
+    gy = np.linspace(*ylim, n_grid)
+    XX, YY = np.meshgrid(gx, gy)
+    flat = jnp.asarray(np.stack([XX.ravel(), YY.ravel()], axis=1), dtype=jnp.float32)
+    inp = (
+        jnp.concatenate(
+            [flat, jnp.full((flat.shape[0], 1), float(model.t_grid[len(model.t_grid) // 2]))],
+            axis=1,
+        )
+        if model.time_conditioned
+        else flat
+    )
+    V_l = (
+        np.asarray(jax.vmap(model.potential_net)(inp).squeeze(-1))
+        .reshape(n_grid, n_grid)
+        .copy()
+    )
+    V_l -= V_l.mean()
+    V_t = np.asarray(jax.vmap(v_true)(flat)).reshape(n_grid, n_grid)
+    r2_v = _pattern_r2(V_l, V_t)
+
+    r2_w = float("nan")
+    if model.interaction_net is not None:
+        tt = np.asarray(train_data.t)
+        mid = np.unique(tt)[len(np.unique(tt)) // 2]
+        sel = np.asarray(train_data.x)[np.isclose(tt, mid, atol=1e-6)]
+        d = np.linalg.norm(sel[:, None, :] - sel[None, :, :], axis=-1)
+        d = d[np.triu_indices_from(d, k=1)]
+        r_lo, r_hi = np.percentile(d, [5, 95]) if d.size > 0 else (0.0, 1.0)
+        r = jnp.linspace(0.01, 5.0, 400)
+        xs = (
+            (r**2).reshape(-1, 1)
+            if model.interaction_type == "radial"
+            else jnp.stack([r, jnp.zeros_like(r)], axis=1)
+        )
+        W_l = np.asarray(jax.vmap(model.interaction_net)(xs).squeeze(-1))
+        r_np = np.asarray(r)
+        W_t = np.asarray([float(w_true(jnp.array([rv, 0.0]))) for rv in r_np])
+        in_band = (r_np >= r_lo) & (r_np <= r_hi)
+        r2_w = _pattern_r2(W_l[in_band], W_t[in_band])
+    return r2_v, r2_w
+
+
 def _evaluate(ctx: Context) -> None:
-    """Held-out distributional metrics (EMD/W1, W2, MMD) → ``metrics.csv``."""
+    """Held-out distributional metrics + functional recovery → ``metrics.csv``.
+
+    Distributional (EMD/W1, W2, BW², MMD) plus pattern-R² of the learned V_θ / W_θ
+    against the CIS ground truth and training timing (paper Table 3, ours).
+    """
     from stitching.evaluate import evaluate_test_metrics
     from stitching.utils.persistence import fit_id_for
 
@@ -41,18 +111,40 @@ def _evaluate(ctx: Context) -> None:
     mfull = evaluate_test_metrics(
         run.model, run.train_data, run.test_data, eval_reps=run.cfg.eval_reps
     )
+    r2_v, r2_w = _functional_r2(run)
+    total_s = run.metrics.get("wall_time_s", float("nan"))
+    per_iter_s = total_s / run.cfg.epochs if run.cfg.epochs else float("nan")
     row = {
         "variant": "cis",
         "fit_id": fit_id_for(run.train_data, run.test_data),
         "emd_w1": float(mfull["emd"]["mean"]),
         "w2": float(mfull["w2"]["mean"]),
+        "bw2": float(mfull["bw2"]["mean"]),
         "mmd": float(mfull["mmd"]["mean"]),
+        "r2_v": r2_v,
+        "r2_w": r2_w,
+        "per_iter_s": per_iter_s,
+        "total_s": total_s,
     }
     path = ctx.write_csv(
-        "metrics.csv", [row], fieldnames=("variant", "fit_id", "emd_w1", "w2", "mmd")
+        "metrics.csv",
+        [row],
+        fieldnames=(
+            "variant",
+            "fit_id",
+            "emd_w1",
+            "w2",
+            "bw2",
+            "mmd",
+            "r2_v",
+            "r2_w",
+            "per_iter_s",
+            "total_s",
+        ),
     )
     print(
-        f"  EMD/W1={row['emd_w1']:.3f} W2={row['w2']:.3f} MMD={row['mmd']:.4f} → {path}"
+        f"  EMD/W1={row['emd_w1']:.3f} W2={row['w2']:.3f} BW²={row['bw2']:.3f} "
+        f"MMD={row['mmd']:.4f} R²(V)={r2_v:.2f} R²(W)={r2_w:.2f} → {path}"
     )
 
 

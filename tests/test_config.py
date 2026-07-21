@@ -108,6 +108,37 @@ def test_misplaced_structural_field_on_lightspeed_warns() -> None:
     )
 
 
+def test_trajectory_init_defaults_to_ot_and_round_trips() -> None:
+    # The new Stitching-only structural field: default keeps the shipped "ot"
+    # behaviour, and an explicit override survives from_dict.
+    assert load_config(None).trajectory_init == "ot"
+    cfg = Config.from_dict(
+        {"potential": "doublewell", "model": "stitching", "trajectory_init": "mccann"}
+    )
+    assert cfg.trajectory_init == "mccann"
+
+
+def test_trajectory_init_on_lightspeed_warns() -> None:
+    # trajectory_init is Stitching-owned (in only_fields); setting it on a
+    # lightspeed run must warn that it is a misplaced override, not silently
+    # take effect (Lightspeed has no trajectory to seed).
+    import warnings
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        Config.from_dict(
+            {
+                "potential": "doublewell",
+                "model": "lightspeed",
+                "trajectory_init": "mccann",
+            }
+        )
+    assert any(
+        "trajectory_init" in str(w.message) and "misplaced override" in str(w.message)
+        for w in caught
+    )
+
+
 def test_composite_with_too_many_parts_raises() -> None:
     with pytest.raises(ValueError, match="Composite config"):
         load_config("a:b:c:d")
